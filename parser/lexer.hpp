@@ -11,9 +11,9 @@ namespace gmsc
 		static const std::vector<std::pair<std::string, TokenType>> basic_matches;
 		const std::string& _source;
 
-		std::string _last_value;
 		char _last_char = ' ';
 		Token _last_token;
+		std::string _last_value;
 
 		size_t _line = 0, _col = 0;
 		typedef std::string::const_iterator sit_t;
@@ -41,12 +41,13 @@ public:
 	public:
 		Lexer(const std::string& source);
 
-		char last_char() const;
 		Token last_token() const;
-		std::string last_value() const; // includes literals as well
+		std::string last_value() const;
 
-		size_t line() const;
-		size_t column() const;
+		size_t line() const; // return the last token line
+		size_t column() const; // return the last token column
+
+		sit_t source_iterator(); // return the current source iterator
     };
 }
 

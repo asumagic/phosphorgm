@@ -2,4 +2,5 @@
 
 namespace gmsc
 {
+	ASTNode::~ASTNode() {}
 }

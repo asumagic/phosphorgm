@@ -12,7 +12,10 @@ namespace gmsc
 
     class ASTStatementBlock : public ASTStatement
     {
+		std::vector<std::shared_ptr<ASTStatement>> _block;
 
+	public:
+		void append(std::shared_ptr<ASTStatement> statement);
     };
 }
 

@@ -15,12 +15,20 @@ namespace gmsc
     {
         CallType _type;
         std::string _call_name;
-        std::vector<ASTExpression*> _arguments;
+		std::vector<std::shared_ptr<ASTExpression>> _arguments;
+
+	public:
+		ASTCallExpression(const std::string function);
+		void append_argument(std::shared_ptr<ASTExpression>&& argument);
     };
 
     class ASTCallStatement : public ASTStatement
     {
-        ASTCallExpression* _expression;
+		ASTCallExpression _expression;
+
+	public:
+		ASTCallStatement(const std::string function);
+		ASTCallExpression& get_expression();
     };
 }
 

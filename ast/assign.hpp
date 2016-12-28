@@ -8,12 +8,28 @@ namespace gmsc
 {
     class ASTAssignment : public ASTStatement
     {
-		std::unique_ptr<ASTVariable> _variable;
-		std::unique_ptr<ASTExpression> _expression;
+		std::shared_ptr<ASTVariable> _variable;
+		std::shared_ptr<ASTExpression> _expression;
 
 	public:
-		ASTAssignment(std::unique_ptr<ASTVariable>&& var, std::unique_ptr<ASTExpression>&& expr);
+		ASTAssignment(std::shared_ptr<ASTVariable> var, std::shared_ptr<ASTExpression> expr);
     };
+
+	enum class ASTAssignUnopType
+	{
+		Increment,
+		Decrement
+	};
+
+	class ASTUnopAssign : public ASTStatement // ++ --
+	{
+		ASTAssignUnopType _operator;
+		bool _post;
+		std::shared_ptr<ASTVariable> _variable;
+
+	public:
+		ASTUnopAssign(ASTAssignUnopType op, bool return_post_op, std::shared_ptr<ASTVariable> variable);
+	};
 }
 
 #endif // ASSIGN_HPP

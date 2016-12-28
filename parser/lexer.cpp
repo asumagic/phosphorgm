@@ -1,4 +1,5 @@
 #include "lexer.hpp"
+#include "errors.hpp"
 
 #include <algorithm>
 #include <vector>
@@ -133,7 +134,7 @@ namespace gmsc
 	char Lexer::readchar()
 	{
 		if (eof())
-			throw std::runtime_error("Lexer crash : EOF was not handled (l" + std::to_string(_line) + ")"); // @TODO: cleaner error management
+			throw LexerException{"Reached EOF (lexer crash)", _line, _col};
 
 		_last_char = *_it;
 		if (_it == end(_source))
@@ -148,7 +149,7 @@ namespace gmsc
 		}
 		else
 		{
-			++_col;
+			++_col; // keep going
 		}
 
 
@@ -157,14 +158,14 @@ namespace gmsc
 
 	Token Lexer::readtok()
 	{
-		if (eof())
-			return Token{TokenType::End, _line, _col};
+		if (eof()) // Handle EOF properly
+			return _last_token = Token{TokenType::End, _line, _col};
 
-		if (_current_parsed)
+		if (_current_parsed) // Skip the character if it's parsed already
 		{
 			readchar();
 			if (eof())
-				return Token{TokenType::End, _line, _col}; // @TODO less eof checks?
+				return _last_token = Token{TokenType::End, _line, _col};
 		}
 		else
 			_current_parsed = true;
@@ -174,7 +175,7 @@ namespace gmsc
 		{
 			readchar();
 			if (eof())
-				return Token{TokenType::End, _line, _col};
+				return _last_token = Token{TokenType::End, _line, _col};
 		}
 
 		size_t tline = _line, tcol = _col;
@@ -186,7 +187,7 @@ namespace gmsc
 			{
 				while(!is_line_end(readchar()));
 				if (eof())
-					return Token{TokenType::End, tline, tcol};
+					return _last_token = Token{TokenType::End, tline, tcol};
 			}
 			else if (_last_char == '*') // multi-line comment
 			{
@@ -194,10 +195,10 @@ namespace gmsc
 					while (readchar() != '*')
 					{
 						if (eof())
-							return Token{TokenType::End, tline, tcol}; // @todo : warning : multiline comment reachs eof
+							throw LexerException{"Multi-line comment reaches EOF", tline, tcol};
 					}
 				} while (readchar() != '/');
-				return readtok();
+				return _last_token = readtok();
 			}
 			else
 				_current_parsed = false;
@@ -205,8 +206,8 @@ namespace gmsc
 
 		if (_last_char == '\"' || _last_char == '\'') // parse string literals
 		{
-			char delim = _last_char; // GML supports both "abc" and 'abc' - handle both
 			_last_value.clear();
+			char delim = _last_char; // GML supports both "abc" and 'abc' - handle both
 
 			while (readchar() != delim) // nb : strings can be multiline, don't handle '\n' separately
 			{
@@ -214,7 +215,7 @@ namespace gmsc
 				{
 					readchar();
 					if (eof())
-						return Token{TokenType::End, tline, tcol};
+						return _last_token = Token{TokenType::End, tline, tcol};
 					else if (_last_char == delim)
 						_last_value += delim;
 					else if (_last_char == 'n')
@@ -234,12 +235,12 @@ namespace gmsc
 
 			}
 
-			return Token{TokenType::StringLiteral, tline, tcol};
+			return _last_token = Token{TokenType::StringLiteral, tline, tcol};
 		}
 
 		if (_last_char == '$')
 		{
-			std::runtime_error("Lexer stub : ColorLiteral");
+			throw LexerException("Hex colors are a stub", tline, tcol);
 		}
 
 		std::string peekstr = _source.substr(static_cast<size_t>(_it - begin(_source) - 1), 4);
@@ -250,40 +251,37 @@ namespace gmsc
 				for (size_t j = 1; j < basic_matches[i].first.size(); ++j)
 					readchar();
 
-				return Token{basic_matches[i].second, tline, tcol};
+				return _last_token = Token{basic_matches[i].second, tline, tcol};
 			}
 		}
 
+		_last_value.clear(); // Clear _last_value for tokens with values below
+
 		if (is_numeral(_last_char)) // parse reals
 		{
-			_last_value.clear();
+			Token literal{TokenType::RealLiteral, tline, tcol};
 
 			do {
 				_last_value += _last_char;
 			} while (is_numeral(readchar()));
 			_current_parsed = false;
 
-			return Token{TokenType::RealLiteral, tline, tcol};
+			return _last_token = literal;
 		}
 
 		if (is_identifier_begin(_last_char)) // parse identifiers
 		{
-			_last_value.clear();
+			Token identifier{TokenType::Identifier, tline, tcol};
 
 			do {
 				_last_value += _last_char;
 			} while (is_identifier(readchar()));
 			_current_parsed = false;
 
-			return Token{TokenType::Identifier, tline, tcol};
+			return _last_token = identifier;
 		}
 
-		return Token{TokenType::Undefined, tline, tcol};
-	}
-
-	char Lexer::last_char() const
-	{
-		return _last_char;
+		throw LexerException{"Unknown token", tline, tcol};
 	}
 
 	Token Lexer::last_token() const
@@ -298,11 +296,16 @@ namespace gmsc
 
 	size_t Lexer::line() const
 	{
-		return _line;
+		return _last_token.line;
 	}
 
 	size_t Lexer::column() const
 	{
-		return _col;
+		return _last_token.col;
+	}
+
+	Lexer::sit_t Lexer::source_iterator()
+	{
+		return _it;
 	}
 }

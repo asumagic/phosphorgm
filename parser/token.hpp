@@ -2,6 +2,7 @@
 #define TOKEN_HPP
 
 #include <cstddef> // special int types
+#include <string>
 
 namespace gmsc
 {
@@ -11,100 +12,96 @@ namespace gmsc
 
 		Undefined = 0,
 
-		End = -1,
+		End,
 
-		BraceLeft = -2, // '{'
-		BraceRight = -3, // '}'
+		BraceLeft, // '{'
+		BraceRight, // '}'
 
-		ParenthesisLeft = -4, // '('
-		ParenthesisRight = -5, // ')'
+		ParenthesisLeft, // '('
+		ParenthesisRight, // ')'
 
-		Comma = -6, // ','
-		Dot = -7, // '.'
-		Semicolon = -8, // ';'
+		Comma, // ','
+		Dot, // '.'
+		Semicolon, // ';'
 
-		Identifier = -9,
+		Identifier,
 
-		StringLiteral = -10,
-		RealLiteral = -11,
-		IntegerLiteral = -12,
-		ColorLiteral = -13, // Hex literal - $BBGGRR
+		StringLiteral,
+		RealLiteral,
+		IntegerLiteral,
+		ColorLiteral, // Hex literal - $BBGGRR
 
-		AccessorLeftArrayValue = -14, // '['
-		AccessorLeftArrayRef = -15, // '[@'
-		AccessorLeftDSList = -16, // '[|'
-		AccessorLeftDSMap = -17, // '[?'
-		AccessorLeftDSGrid = -18, // '[#'
-		AccessorRight = -19, // ']'
+		AccessorLeftArrayValue, // '['
+		AccessorLeftArrayRef, // '[@'
+		AccessorLeftDSList, // '[|'
+		AccessorLeftDSMap, // '[?'
+		AccessorLeftDSGrid, // '[#'
+		AccessorRight, // ']'
 
-		If = -20, // 'if'
-		Else = -21, // 'else'
-		ElseIf = -22, // 'else if'
+		If, // 'if'
+		Else, // 'else'
+		ElseIf, // 'else if'
 
-		For = -23, // 'for'
-		While = -24, // 'while'
-		Do = -25, // 'do'
-		Repeat = -26, // 'repeat'
-		With = -27, // 'with'
+		For, // 'for'
+		While, // 'while'
+		Do, // 'do'
+		Repeat, // 'repeat'
+		With, // 'with'
 
-		Equal = -28, // '='
-		DEqual = -29, // '=='
-		NotEqual = -30, // '<>' and '!='
-		Inferior = -31, // '<'
-		InferiorEqual = -32, // '<='
-		Superior = -33, // '>'
-		SuperiorEqual = -34, // '>='
+		Equal, // '='
+		DEqual, // '=='
+		NotEqual, // '<>' and '!='
+		Inferior, // '<'
+		InferiorEqual, // '<='
+		Superior, // '>'
+		SuperiorEqual, // '>='
 
-		Plus = -35, // '+'
-		Minus = -36, // '-'
-		Multiply = -37, // '*'
-		Divide = -38, // '/'
+		Plus, // '+'
+		Minus, // '-'
+		Multiply, // '*'
+		Divide, // '/'
 
-		EuclDivide = -39, // 'div'
-		EuclModulo = -40, // 'mod' and '%'
+		EuclDivide, // 'div'
+		EuclModulo, // 'mod' and '%'
 
-		BitAnd = -41, // '&'
-		BitOr = -42, // '|'
-		BitXor = -43, // '^'
-		BitShiftLeft = -44, // '<<'
-		BitShiftRight = -45, // '>>'
+		BitAnd, // '&'
+		BitOr, // '|'
+		BitXor, // '^'
+		BitShiftLeft, // '<<'
+		BitShiftRight, // '>>'
 
-		LogicAnd = -46, // '&&'
-		LogicOr = -47, // '||'
-		LogicXor = -48, // '^^'
+		LogicAnd, // '&&'
+		LogicOr, // '||'
+		LogicXor, // '^^'
 
-		AssignAdd = -49, // '+='
-		AssignSubtract = -50, // '-='
-		AssignMultiply = -51, // '*='
-		AssignDivide = -52, // '/='
+		AssignAdd, // '+='
+		AssignSubtract, // '-='
+		AssignMultiply, // '*='
+		AssignDivide, // '/='
 
-		AssignAnd = -53, // '&='
-		AssignOr = -54, // '|='
-		AssignXor = -55, // '^='
-		AssignShiftLeft = -56, // '<<='
-		AssignShiftRight = -57, // '>>='
+		AssignAnd, // '&='
+		AssignOr, // '|='
+		AssignXor, // '^='
+		AssignShiftLeft, // '<<='
+		AssignShiftRight, // '>>='
 
-		Increment = -58, // '++'
-		Decrement = -59, // '--'
+		Increment, // '++'
+		Decrement, // '--'
 
-		LineFeed = -60, // '\n'
+		LineFeed, // '\n'
 
-		LocalVar = -61, // 'var'
+		LocalVar, // 'var'
 	};
 
-    class Token
+	struct Token
     {
-		size_t _line, _col;
-		TokenType _type;
+		Token() = default;
+		Token(const TokenType type, size_t line = 0, size_t col = 0);
 
-	public:
-		Token(const TokenType type = TokenType::Undefined, size_t line = 0, size_t col = 0);
+		size_t line, col;
+		TokenType type;
 
 		bool is_assign() const;
-
-		TokenType type() const;
-		size_t line() const;
-		size_t column() const;
     };
 }
 

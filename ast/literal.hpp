@@ -7,17 +7,28 @@ namespace gmsc
 {
     class ASTStringLiteral : public ASTExpression
     {
-        std::string _string;
-    };
+		std::string _string;
+
+	public:
+		ASTStringLiteral(const std::string str);
+	};
 
     class ASTIntegerLiteral : public ASTExpression
     {
         long long _number;
+
+	public:
+		ASTIntegerLiteral(const std::string str);
+		ASTIntegerLiteral(const long long integer);
     };
 
     class ASTRealLiteral : public ASTExpression
     {
         double _number;
+
+	public:
+		ASTRealLiteral(const std::string str);
+		ASTRealLiteral(const double real);
     };
 }
 
