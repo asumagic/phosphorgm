@@ -1,6 +1,6 @@
 # PhosphorGM
 
-The Phosphor open-source GameMaker:Studio toolchain. It is meant to be a simple toolchain built from scratch, fully independently from GM:S.
+The Phosphor open-source GameMaker:Studio toolchain. It is meant to be a simple toolchain built from scratch, completely independent from GM:S.
 
 PhosphorGM is a work in progress. It is not yet possible to generate bytecode or any sort of directly interpretable structure (for now).
 
